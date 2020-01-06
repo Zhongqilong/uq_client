@@ -58,11 +58,15 @@ for k, v in ipairs(set) do
             print(file_path)
             if isDir(root .. f) then
                 local dest_file = dest_path .. f
+                local extrude = 1
+                if v == 'idle' or v == 'soldier' then
+                    extrude = 0
+                end
                 --force-squared
                 --max size 16384
                 --prepend-folder-name         Adds the smart folders name to the sprite names
                 --png-opt-level <value>       Optimization level for pngs (0=off, 1=use 8-bit, 2..7=png-opt)
-                local cmd = string.format('TexturePacker %s --sheet %s.png --data %s.plist --format cocos2d --texture-format %s --algorithm MaxRects --trim-mode Trim --opt RGBA8888 --max-size 4096 --png-opt-level 1 --extrude 0', file_path, dest_file, dest_file, PNG_FORMAT)
+                local cmd = string.format('TexturePacker %s --sheet %s-{n}.png --data %s-{n}.plist --format cocos2d --texture-format %s --algorithm MaxRects --trim-mode None --opt RGBA8888 --max-size 2048 --extrude %d --png-opt-level 1 --multipack', file_path, dest_file, dest_file, PNG_FORMAT, extrude)
                 -- cmd = cmd .. ';' .. "pngquant -f --ext .png --quality 10-90 --speed 1 " .. dest_file .. ".png"
                 os.execute(cmd)
             else
@@ -80,15 +84,16 @@ for k, v in ipairs(set) do
             local parts = string.split(f, '.')
             local file_path = dest_path .. f
             local name, file_type = getFileType(f)
+            local strs = string.split(name, '-')
             if file_type == 'png' then
-                if not dir_list[v .. '/' .. name] then
+                if not dir_list[v .. '/' .. strs[1]] then
                     print('remove', file_path)
                     os.execute('rm -rf ' .. file_path)
 
                     local plist_path = dest_path .. name .. '.plist'
                     os.execute('rm -rf ' .. plist_path)
 
-                    local txt_path = dest_path .. name .. '.txt'
+                    local txt_path = dest_path .. strs[1] .. '.txt'
                     if isExist(txt_path) then
                         os.execute('rm -rf ' .. txt_path)
                     end
@@ -99,5 +104,5 @@ for k, v in ipairs(set) do
 end
 
 local path = '/Users/admin/code/client/commit/project_wly2_lua_client'
-os.execute('cd ' .. path .. ";pwd;git add res/animation/" .. args.set .. ";git commit -m 'update effect resource';git push origin HEAD:refs/for/master")
+os.execute('cd ' .. path .. ";pwd;git add res/animation;git commit -m 'update effect resource';git push origin HEAD:refs/for/master")
 

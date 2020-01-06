@@ -137,7 +137,7 @@ for k, v in ipairs(set) do
                 --force-squared
                 --max size 16384
                 --png-opt-level <value>       Optimization level for pngs (0=off, 1=use 8-bit, 2..7=png-opt)
-                local cmd = string.format('TexturePacker %s --sheet %s.png --data %s.plist --format cocos2d --texture-format %s --algorithm MaxRects --trim-mode Trim --opt RGBA8888 --max-size 4096', file_path, dest_file, dest_file, PNG_FORMAT)
+                local cmd = string.format('TexturePacker %s --sheet %s.png --data %s.plist --format cocos2d --texture-format %s --algorithm MaxRects --trim-mode Trim --opt RGBA8888 --max-size 4096 --extrude 1', file_path, dest_file, dest_file, PNG_FORMAT)
                 -- cmd = cmd .. ';' .. "pngquant -f --ext .png --quality 10-90 --speed 1 " .. dest_file .. ".png"
                 os.execute(cmd)
             else

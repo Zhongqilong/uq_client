@@ -88,6 +88,7 @@ local function convertLua(src_folder)
 					end
 				end
 				if not unplist_map[str] then
+					used_tex[str] = true
 					return "\"img" .. string.sub(x, 11, #x - 1) .. "1"
 				else
 					return "\"img" .. string.sub(x, 11, #x - 1) .. "0"
@@ -107,7 +108,10 @@ local function convertLua(src_folder)
 
 				if line then
 					if string.find(line, "enableShadow") ~= nil then
-						line = string.gsub(line, "a = 255", "a = 127.5")
+					elseif string.find(line, "setBlendFunc%({src = 1, dst = 771}%)") ~= nil then
+						line = ''
+					elseif string.find(line, "Result.create") ~= nil then
+						line = line .. '\n' .. 'add_plist'
 					elseif string.find(line, "cc.Sprite:create%(\"img_local/") ~= nil then
 						--替换 Sprite:create 为 Sprite:createWithSpriteFrameName
 						local arr = string.split(line, "/")
@@ -120,6 +124,7 @@ local function convertLua(src_folder)
 							end
 						end
 						if not unplist_map[str] then
+							used_tex[str] = true
 							line = string.gsub(line, "cc.Sprite:create%(\"img_local/", "cc.Sprite:createWithSpriteFrameName(\"img/")
 						else
 							line = string.gsub(line, "cc.Sprite:create%(\"img_local/", "cc.Sprite:create(\"img/")
@@ -134,6 +139,12 @@ local function convertLua(src_folder)
 				end
 			end
 			text = text .. "return Result"
+
+			local str = ''
+			for k, item in pairs(used_tex) do
+				str = str .. "cc.SpriteFrameCache:getInstance():addSpriteFrames(\"img/" .. k .. ".plist\")" .. '\n'
+			end
+			text = string.gsub(text, 'add_plist', str)
 
 			local path = src_folder .. f
 			local path_dest = string.gsub(path, '/ui_local/', '/ui/')
